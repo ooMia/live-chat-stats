@@ -6,10 +6,3 @@ export class AppService {
     return 'Hello World!';
   }
 }
-
-@Injectable()
-export class CatsService {
-  findAll(): string {
-    return 'This action returns all cats';
-  }
-}
