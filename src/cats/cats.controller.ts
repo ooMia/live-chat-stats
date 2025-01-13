@@ -34,7 +34,9 @@ export class CatsController {
     });
   }
 
-  @Get()
+  // https://docs.nestjs.com/controllers#route-wildcards
+  // empty or non-numeric string
+  @Get('^$|[^0-9]')
   findAll() {
     return this.catsService.findAll();
   }
