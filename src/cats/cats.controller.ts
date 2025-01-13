@@ -8,6 +8,7 @@ import {
   Delete,
   Req,
   Res,
+  HttpCode,
 } from '@nestjs/common';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './dto/create-cat.dto';
@@ -18,7 +19,10 @@ import { Request, Response } from 'express';
 export class CatsController {
   constructor(private readonly catsService: CatsService) {}
 
+  // https://docs.nestjs.com/controllers#status-code
+  // status code 200 by default, except for POST which is 201
   @Post()
+  @HttpCode(201)
   create(
     @Body() createCatDto: CreateCatDto,
     @Req() req: Request,
@@ -27,6 +31,7 @@ export class CatsController {
     this.catsService.create(createCatDto);
     // https://docs.nestjs.com/controllers#routing
     // https://docs.nestjs.com/controllers#request-object
+    // res.status overrides the decorator's status code
     return res.status(200).json({
       message: 'success',
       host: req.host,
