@@ -11,11 +11,13 @@ import {
   HttpCode,
   Header,
   Redirect,
+  HttpStatus,
 } from '@nestjs/common';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
 import { Request, Response } from 'express';
+import { BroadResponse } from './entities/broad.entity';
 
 @Controller('cats')
 export class CatsController {
@@ -33,20 +35,36 @@ export class CatsController {
     this.catsService.create(createCatDto);
     // https://docs.nestjs.com/controllers#routing
     // https://docs.nestjs.com/controllers#request-object
+    // https://docs.nestjs.com/controllers#library-specific-approach
     // res.status overrides the decorator's status code
-    return res.status(200).json({
-      message: 'success',
+    // should respond when using res as a param
+    return res.status(HttpStatus.CREATED).json({
+      message: 'CREATED',
       host: req.host,
       data: createCatDto,
     });
   }
 
   // https://docs.nestjs.com/controllers#redirection
-  // cannot be routed if this method comes after findAll
+  // https://docs.nestjs.com/controllers#route-parameters
+  // cannot be routed when it comes after findAll
+  // Routes with parameters should be declared after any static paths. This prevents the parameterized paths from intercepting traffic destined for the static paths.
   @Get('redirect')
   @Redirect('https://nestjs.com', 301)
   redirect() {
     return;
+  }
+
+  @Get('fetch')
+  async externalFetch(
+    @Res({
+      passthrough: true,
+    })
+    res: Response,
+  ): Promise<BroadResponse> {
+    // https://docs.nestjs.com/controllers#library-specific-approach
+    res.status(HttpStatus.OK);
+    return await this.catsService.externalFetch();
   }
 
   // https://docs.nestjs.com/controllers#route-wildcards
