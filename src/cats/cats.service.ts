@@ -25,9 +25,6 @@ export class CatsService {
   }
 
   async externalFetch() {
-    // 1. get current timestamp
-    // 2. fetch from https://static.file.sooplive.co.kr/pc/ko_KR/main_broad_list_with_adult_json.js?${timestamp}
-    // 3. return the fetched data
     const timestamp = Date.now();
     const url = `https://static.file.sooplive.co.kr/pc/ko_KR/main_broad_list_with_adult_json.js?${timestamp}`;
     const response = await fetch(url);
