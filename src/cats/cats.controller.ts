@@ -18,16 +18,18 @@ import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
 import { Request, Response } from 'express';
 import { BroadResponse } from './entities/broad.entity';
+import { Cat } from './interfaces/cat.interface';
 
 @Controller('cats')
 export class CatsController {
+  // https://docs.nestjs.com/fundamentals/custom-providers#di-fundamentals
   constructor(private readonly catsService: CatsService) {}
 
   // https://docs.nestjs.com/controllers#status-code
   // status code 200 by default, except for POST which is 201
   @Post()
   @HttpCode(201)
-  create(
+  async create(
     @Body() createCatDto: CreateCatDto,
     @Req() req: Request,
     @Res() res: Response,
@@ -70,7 +72,7 @@ export class CatsController {
   // https://docs.nestjs.com/controllers#route-wildcards
   // empty or non-numeric string
   @Get('^$|[^0-9]')
-  findAll() {
+  async findAll(): Promise<Cat[]> {
     return this.catsService.findAll();
   }
 
