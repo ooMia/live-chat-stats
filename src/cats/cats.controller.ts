@@ -9,6 +9,8 @@ import {
   Req,
   Res,
   HttpCode,
+  Header,
+  Redirect,
 } from '@nestjs/common';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './dto/create-cat.dto';
@@ -39,6 +41,14 @@ export class CatsController {
     });
   }
 
+  // https://docs.nestjs.com/controllers#redirection
+  // cannot be routed if this method comes after findAll
+  @Get('redirect')
+  @Redirect('https://nestjs.com', 301)
+  redirect() {
+    return;
+  }
+
   // https://docs.nestjs.com/controllers#route-wildcards
   // empty or non-numeric string
   @Get('^$|[^0-9]')
@@ -46,7 +56,9 @@ export class CatsController {
     return this.catsService.findAll();
   }
 
+  // https://docs.nestjs.com/controllers#headers
   @Get(':id')
+  @Header('Cache-Control', 'proxy-revalidate')
   findOne(@Param('id') id: string) {
     return this.catsService.findOne(+id);
   }
