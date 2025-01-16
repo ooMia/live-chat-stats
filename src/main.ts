@@ -11,9 +11,10 @@ async function bootstrap() {
     // https://docs.nestjs.com/techniques/validation#stripping-properties
     // https://docs.nestjs.com/techniques/validation#transform-payload-objects
     new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
       transform: true,
+      // TODO: should be set to true in production
+      whitelist: false,
+      forbidNonWhitelisted: false,
     }),
   );
   await app.listen(process.env.PORT ?? 3000);
