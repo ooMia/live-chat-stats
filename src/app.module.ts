@@ -1,13 +1,13 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { User } from './users/entities/user.entity';
-import { LoggerMiddleware } from './logger/logger.middleware';
-import { UserHttpModule } from './users/users-http.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { CatsModule } from './cats/cats.module';
-import { ConfigModule } from '@nestjs/config';
+import { LoggerMiddleware } from './logger/logger.middleware';
+import { User } from './users/entities/user.entity';
+import { UserHttpModule } from './users/users-http.module';
 
 @Module({
   imports: [
@@ -21,7 +21,6 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
       cache: true,
     }),
-    UserHttpModule,
     // https://docs.nestjs.com/techniques/database
     TypeOrmModule.forRoot({
       type: 'mysql',
@@ -35,6 +34,7 @@ import { ConfigModule } from '@nestjs/config';
       autoLoadEntities: true,
       // etc... https://typeorm.io/data-source-options/
     }),
+    UserHttpModule,
     CatsModule, // module which use library-specific approach should be imported last
   ],
   controllers: [AppController],

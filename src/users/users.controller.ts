@@ -4,12 +4,12 @@ import {
   Delete,
   Get,
   Param,
-  Post,
   ParseIntPipe,
+  Post,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
+import { UsersService } from './users.service';
 
 // https://github.com/nestjs/nest/blob/master/sample/05-sql-typeorm/src/users/users.controller.ts
 @Controller('users')
@@ -22,7 +22,7 @@ export class UsersController {
   }
 
   @Get()
-  findAll(): Promise<Array<User>> {
+  findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
 
