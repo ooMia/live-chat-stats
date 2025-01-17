@@ -1,6 +1,4 @@
+pnpm build
 pnpm format
-git add -p
 pnpm lint
 pnpm test
-pnpm build
-git add ./src/metadata.ts

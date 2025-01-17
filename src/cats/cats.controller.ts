@@ -1,22 +1,22 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Header,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Redirect,
   Req,
   Res,
-  HttpCode,
-  Header,
-  Redirect,
-  HttpStatus,
 } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
-import { Request, Response } from 'express';
 import { BroadResponse } from './entities/broad.entity';
 import { Cat } from './interfaces/cat.interface';
 
