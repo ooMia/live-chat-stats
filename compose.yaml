@@ -21,10 +21,31 @@ services:
       timeout: 10s
       retries: 3
 
+  redis:
+    image: redis:${DOCKER_REDIS_VERSION}
+    container_name: ${DOCKER_REDIS_CONTAINER_NAME}
+    env_file: .env
+    ports: ['${REDIS_PORT}:6379']
+    volumes: [redis_data:/data:rw]
+    user: ${UID}:${GID}
+    restart: always
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 10s
+      retries: 3
+
 volumes:
   mysql_data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${DOCKER_MYSQL_DATA_DIR:-./db/data}
+      device: ${DOCKER_MYSQL_DATA_DIR:-./data/db}
+
+  redis_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DOCKER_REDIS_DATA_DIR:-./data/redis}

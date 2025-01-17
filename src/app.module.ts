@@ -8,6 +8,7 @@ import { CatsModule } from './cats/cats.module';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { User } from './users/entities/user.entity';
 import { UserHttpModule } from './users/users-http.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -35,7 +36,8 @@ import { UserHttpModule } from './users/users-http.module';
       // etc... https://typeorm.io/data-source-options/
     }),
     UserHttpModule,
-    CatsModule, // module which use library-specific approach should be imported last
+    CatsModule,
+    EventsModule, // module which use library-specific approach should be imported last
   ],
   controllers: [AppController],
   providers: [AppService],
