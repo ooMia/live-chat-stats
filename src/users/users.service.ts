@@ -11,12 +11,9 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  create(createUserDto: CreateUserDto): Promise<User> {
-    const user = new User();
-    user.firstName = createUserDto.firstName;
-    user.lastName = createUserDto.lastName;
-
-    return this.usersRepository.save(user);
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const user = User.fromDto(createUserDto);
+    return await this.usersRepository.save(user);
   }
 
   async findAll(): Promise<User[]> {
@@ -24,9 +21,12 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  findOne(id: number): Promise<User> {
+  findOne(id: number): Promise<User | null> {
     Logger.log('Fetching one user: controller');
-    return this.usersRepository.findOneBy({ id: id });
+    return this.usersRepository.findOne({
+      where: { id },
+      relations: ['photos'],
+    });
   }
 
   async remove(id: string): Promise<void> {
