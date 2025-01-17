@@ -34,7 +34,7 @@ describe('UserService', () => {
           provide: getRepositoryToken(User),
           useValue: {
             find: jest.fn().mockResolvedValue(userArray),
-            findOneBy: jest.fn().mockResolvedValue(oneUser),
+            findOne: jest.fn().mockResolvedValue(oneUser),
             save: jest.fn().mockResolvedValue(oneUser),
             remove: jest.fn(),
             delete: jest.fn(),
@@ -76,10 +76,13 @@ describe('UserService', () => {
   });
 
   describe('findOne()', () => {
-    it('should get a single user', () => {
-      const repoSpy = jest.spyOn(repository, 'findOneBy');
-      expect(service.findOne(1)).resolves.toEqual(oneUser);
-      expect(repoSpy).toHaveBeenCalledWith({ id: 1 });
+    it('should get a single user', async () => {
+      const repoSpy = jest.spyOn(repository, 'findOne');
+      await expect(service.findOne(1)).resolves.toEqual(oneUser);
+      expect(repoSpy).toHaveBeenCalledWith({
+        where: { id: 1 },
+        relations: ['photos'],
+      });
     });
   });
 
