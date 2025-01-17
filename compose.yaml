@@ -25,12 +25,12 @@ services:
     image: redis:${DOCKER_REDIS_VERSION}
     container_name: ${DOCKER_REDIS_CONTAINER_NAME}
     env_file: .env
-    ports: ["${REDIS_PORT}:6379"]
+    ports: ['${REDIS_PORT}:6379']
     volumes: [redis_data:/data:rw]
     user: ${UID}:${GID}
     restart: always
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 10s
       retries: 3
