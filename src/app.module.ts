@@ -5,10 +5,10 @@ import { DataSource } from 'typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CatsModule } from './cats/cats.module';
+import { EventsModule } from './events/events.module';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { User } from './users/entities/user.entity';
 import { UserHttpModule } from './users/users-http.module';
-import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -26,13 +26,17 @@ import { EventsModule } from './events/events.module';
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
-      port: 3306,
+      port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306,
       username: process.env.MYSQL_USER || 'test',
       password: process.env.MYSQL_PASSWORD || 'test',
       database: process.env.MYSQL_DATABASE || 'test',
-      entities: [User],
       synchronize: true, // shouldn't be used in production - otherwise you can lose production data.
+      logging: true,
       autoLoadEntities: true,
+      entities: [
+        // `${__dirname}/**/*.entity{.ts,.js}`,
+        User,
+      ],
       // etc... https://typeorm.io/data-source-options/
     }),
     UserHttpModule,
