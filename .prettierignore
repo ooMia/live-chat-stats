@@ -4,8 +4,5 @@ dist
 node_modules
 *-lock.yaml
 
-# Ignore all HTML files:
-*.html
-
 # Ignore specific files:
 src/metadata.ts
