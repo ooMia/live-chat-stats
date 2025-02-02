@@ -25,18 +25,18 @@ import { UserHttpModule } from './users/users-http.module';
     // https://docs.nestjs.com/techniques/database
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
-      port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306,
-      username: process.env.MYSQL_USER || 'test',
-      password: process.env.MYSQL_PASSWORD || 'test',
-      database: process.env.MYSQL_DATABASE || 'test',
-      synchronize: true, // shouldn't be used in production - otherwise you can lose production data.
+      host: process.env.MYSQL_HOST! || 'localhost',
+      port: parseInt(process.env.MYSQL_PORT || '3306'),
+      username: process.env.MYSQL_USER || 'user',
+      password: process.env.MYSQL_PASSWORD || 'user',
+      database: process.env.MYSQL_DATABASE || 'dev',
       logging: true,
       autoLoadEntities: true,
       entities: [
         // `${__dirname}/**/*.entity{.ts,.js}`,
         User,
       ],
+      synchronize: true, // shouldn't be used in production - otherwise you can lose production data.
       // etc... https://typeorm.io/data-source-options/
     }),
     UserHttpModule,
