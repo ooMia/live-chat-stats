@@ -6,10 +6,11 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "postinstall": "mkdir -p ./data/db ./data/redis",
     "build": "nest build",
     "format": "prettier --write . --ignore-path .prettierignore",
     "start": "nest start",
-    "start:dev": "pnpm docker:start && nest start --watch",
+    "start:dev": "NODE_ENV=development pnpm docker:start:deps && nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "NODE_ENV=production node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -20,10 +21,11 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "git:undo": "git reset --soft HEAD~1",
     "git:reset:origin": "git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)",
-    "docker:build": "docker compose up --build",
-    "docker:start": "docker compose up -d",
+    "docker:start:deps": "docker compose -f compose-dev.yaml up -d ",
+    "docker:build": "pnpm docker:reset && docker compose up --build --force-recreate",
     "docker:status": "docker ps --filter 'name=dev' --format json | jq -c '{Names: .Names, State: .State}'",
     "docker:down": "docker compose down",
+    "docker:reset": "docker compose down && docker volume prune -af",
     "prepare": "husky"
   },
   "dependencies": {
@@ -89,7 +91,7 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": "./src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": [
