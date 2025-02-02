@@ -1,0 +1,29 @@
+# Description: Docker compose file for development environment
+
+services:
+  nginx:
+    volumes:
+      - ./deps/nginx/nginx.dev.conf:/etc/nginx/nginx.conf
+    extends:
+      file: compose-deps-template.yaml
+      service: nginx
+
+  mysql:
+    extends:
+      file: compose-deps-template.yaml
+      service: mysql
+    ports:
+      - '${MYSQL_PORT:-3306}:3306'
+      - '${MYSQL_XPORT:-33060}:33060'
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-dev}
+      MYSQL_USER: ${MYSQL_USER:-user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-user}
+
+  redis:
+    extends:
+      file: compose-deps-template.yaml
+      service: redis
+    ports:
+      - '${REDIS_PORT:-6379}:6379'

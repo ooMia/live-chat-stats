@@ -1,39 +1,66 @@
+# Description: Docker compose file for production environment
+# Docker automatically imports .env when compose up
+
 services:
-  mysql:
-    image: mysql:${DOCKER_MYSQL_VERSION:-latest}
-    container_name: ${DOCKER_MYSQL_CONTAINER_NAME:-mysql_dev_container}
-    env_file: .env
+  nginx:
+    networks: ['front-tier']
+    extends:
+      file: compose-deps-template.yaml
+      service: nginx
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app_prod_container
+    env_file:
+      - required: true
+        path: .env.production.local
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?error}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:?error}
-      MYSQL_USER: ${MYSQL_USER:?error}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?error}
-    ports:
-      - '${MYSQL_PORT:-3306}:3306'
-      - '${MYSQL_XPORT:-33060}:33060'
-    volumes:
-      - mysql_data:/var/lib/mysql:rw
-    user: root
+      NODE_ENV: production
+      MYSQL_HOST: mysql
+      REDIS_HOST: redis
+    expose: ['${APP_PORT:-3000}']
     restart: always
     healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      test: ['CMD', 'wget', '-q', '-O', '-', 'http://localhost:3000/health']
       interval: 10s
       timeout: 10s
       retries: 3
+    networks: ['front-tier', 'back-tier']
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  mysql:
+    volumes: [mysql_data:/var/lib/mysql:rw]
+    networks: ['back-tier']
+    expose:
+      - '${MYSQL_PORT:-3306}'
+      - '${MYSQL_XPORT:-33060}'
+    secrets: ['root_password']
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/root_password
+    extends:
+      file: compose-deps-template.yaml
+      service: mysql
 
   redis:
-    image: redis:${DOCKER_REDIS_VERSION:-latest}
-    container_name: ${DOCKER_REDIS_CONTAINER_NAME:-redis_dev_container}
-    env_file: .env
-    ports: ['${REDIS_PORT}:6379']
     volumes: [redis_data:/data:rw]
-    user: ${UID}:${GID}
-    restart: always
-    healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
-      interval: 10s
-      timeout: 10s
-      retries: 3
+    networks: ['back-tier']
+    expose:
+      - '${REDIS_PORT:-6379}'
+    extends:
+      file: compose-deps-template.yaml
+      service: redis
+
+networks:
+  front-tier:
+    driver: bridge
+  back-tier:
+    driver: bridge
 
 volumes:
   mysql_data:
@@ -41,11 +68,15 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ${DOCKER_MYSQL_DATA_DIR:-./data/db}
+      device: ${REDIS_BIND_ROOT:-deps/db}
 
   redis_data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${DOCKER_REDIS_DATA_DIR:-./data/redis}
+      device: ${REDIS_BIND_ROOT:-deps/redis}
+
+secrets:
+  root_password:
+    file: deps/root_password.txt
