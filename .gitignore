@@ -55,7 +55,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # dependency directories
 deps/*
-!deps/root_password.example.txt
+!deps/*.example.*
 !deps/nginx
 deps/nginx/*
 !deps/nginx/nginx*.conf
