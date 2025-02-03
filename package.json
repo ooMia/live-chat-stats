@@ -2,31 +2,33 @@
   "name": "live-chat-stats",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "ooMia",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "postinstall": "mkdir -p ./data/db ./data/redis",
+    "preinstall": "mkdir -p ./deps/db ./deps/redis",
+    "prepare": "husky || echo 'INFO: husky not installed'",
     "build": "nest build",
+    "prestart": "NODE_ENV=development pnpm docker:start:deps",
+    "start": "nest start --watch",
+    "start:debug": "pnpm start --debug --type-check",
+    "start:prod": "pnpm build && NODE_ENV=production node dist/main",
+    "poststart": "pnpm format && pnpm lint",
+    "git:undo": "git reset --soft HEAD~1",
+    "git:reset:origin": "git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)",
     "format": "prettier --write . --ignore-path .prettierignore",
-    "start": "nest start",
-    "start:dev": "NODE_ENV=development pnpm docker:start:deps && nest start --watch",
-    "start:debug": "nest start --debug --watch",
-    "start:prod": "NODE_ENV=production node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "git:undo": "git reset --soft HEAD~1",
-    "git:reset:origin": "git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)",
-    "docker:start:deps": "docker compose -f compose-dev.yaml up -d ",
-    "docker:build": "pnpm docker:reset && docker compose up --build --force-recreate",
-    "docker:status": "docker ps --filter 'name=dev' --format json | jq -c '{Names: .Names, State: .State}'",
-    "docker:down": "docker compose down",
-    "docker:reset": "docker compose down && docker volume prune -af",
-    "prepare": "husky"
+    "test:e2e": "pnpm docker:start:deps && jest --config ./test/jest-e2e.json",
+    "docker:start:deps": "docker compose -f compose-dev.yaml up -d",
+    "docker:start:prod": "pnpm docker:build && docker compose up -d",
+    "docker:build": "docker buildx build . --no-cache --build-arg NODE_VERSION=$(node -v | cut -c 2-) --build-arg NPM_VERSION=$(npm -v | cut -c 2-)",
+    "docker:status": "docker ps --format json | jq -c '{Names: .Names, State: .State}'",
+    "docker:down": "docker compose down --rmi local --volumes",
+    "docker:reset": "pnpm docker:down && docker buildx prune -f"
   },
   "dependencies": {
     "@nestjs/common": "^10.4.15",
@@ -105,5 +107,7 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   },
-  "packageManager": "pnpm@10.0.0+sha512.b8fef5494bd3fe4cbd4edabd0745df2ee5be3e4b0b8b08fa643aa3e4c6702ccc0f00d68fa8a8c9858a735a0032485a44990ed2810526c875e416f001b17df12b"
+  "engines": {
+    "node": ">=23.4.0"
+  }
 }

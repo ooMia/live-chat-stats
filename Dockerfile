@@ -4,14 +4,14 @@
 # If you need more help, visit the Dockerfile reference guide at
 # https://docs.docker.com/go/dockerfile-reference/
 
-# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
-
+# These arguments can be overridden when building the image
+# docker buildx build --build-arg NODE_VERSION=x.x.x --build-arg PNPM_VERSION=x.x.x .
 ARG NODE_VERSION=23.4.0
-ARG PNPM_VERSION=10.0.0
+ARG PNPM_VERSION=10.1.0
 
 ################################################################################
 # Use node image for base image for all stages.
-FROM node:${NODE_VERSION}-alpine as base
+FROM node:${NODE_VERSION}-alpine AS base
 
 # Set working directory for all build stages.
 WORKDIR /usr/src/app
@@ -22,7 +22,7 @@ RUN --mount=type=cache,target=/root/.npm \
 
 ################################################################################
 # Create a stage for installing production dependecies.
-FROM base as deps
+FROM base AS deps
 
 # Download dependencies as a separate step to take advantage of Docker's caching.
 # Leverage a cache mount to /root/.local/share/pnpm/store to speed up subsequent builds.
@@ -35,7 +35,7 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 
 ################################################################################
 # Create a stage for building the application.
-FROM deps as build
+FROM deps AS build
 
 # Download additional development dependencies before building, as some projects require
 # "devDependencies" to be installed to build. If you don't need this, remove this step.
@@ -46,16 +46,17 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 
 # Copy the rest of the source files into the image.
 COPY . .
+
 # Run the build script.
 RUN pnpm build
 
 ################################################################################
 # Create a new stage to run the application with minimal runtime dependencies
 # where the necessary files are copied from the build stage.
-FROM base as final
+FROM base AS final
 
 # Use production node environment by default.
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 # Run the application as a non-root user.
 USER node
@@ -72,4 +73,4 @@ COPY --from=build /usr/src/app/dist ./dist
 EXPOSE 3000
 
 # Run the application.
-CMD pnpm start:prod
+CMD ["node", "dist/main"]
