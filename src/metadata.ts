@@ -1,4 +1,3 @@
- 
 export default async () => {
     const t = {
         ["./users/entities/user.entity"]: await import("./users/entities/user.entity"),
