@@ -1,8 +1,9 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express/interfaces';
-import { AppModule } from './app.module';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { RedisIoAdapter } from './adapters/redis-io.adapter';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -23,6 +24,18 @@ async function bootstrap() {
   const redisIoAdapter = new RedisIoAdapter(app);
   await redisIoAdapter.connectToRedis();
   app.useWebSocketAdapter(redisIoAdapter);
+
+  // https://docs.nestjs.com/openapi/introduction#document-options
+  const config = new DocumentBuilder()
+    .setTitle('Cats example')
+    .setDescription('The cats API description')
+    .setVersion('1.0')
+    .addTag('cats')
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+
+  // https://docs.nestjs.com/openapi/introduction#setup-options
+  SwaggerModule.setup('api', app, documentFactory);
 
   await app.listen(process.env.APP_PORT || 3000);
   console.log(`Application is running on: ${await app.getUrl()}`);

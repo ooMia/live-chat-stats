@@ -5,11 +5,12 @@ import { UsersService } from './users.service';
 
 import { PhotosModule } from './photos.module';
 import { PhotosService } from './photos.service';
+import { UserExistsValidator } from './users.decorator';
 
 @Module({
   imports: [UsersModule, PhotosModule],
   // inject Repository into Service using the @InjectRepository() decorator
-  providers: [UsersService, PhotosService],
+  providers: [UsersService, PhotosService, UserExistsValidator],
   controllers: [UsersController],
 })
 export class UserHttpModule {}
