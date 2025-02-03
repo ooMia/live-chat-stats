@@ -1,11 +1,11 @@
-# Ignore artifacts:
-db
+# Development files
+coverage
+deps
+
+# Artifacts
 dist
 node_modules
 *-lock.yaml
 
-# Ignore all HTML files:
-*.html
-
-# Ignore specific files:
+# etc
 src/metadata.ts

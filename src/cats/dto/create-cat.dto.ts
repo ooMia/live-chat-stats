@@ -1,20 +1,20 @@
+import { IsDateString, IsString } from 'class-validator';
 import { Cat } from '../interfaces/cat.interface';
 
 export class CreateCatDto {
-  name: string;
-  birthday: Date; // 2024-01-01
-  breed: string;
+  @IsString()
+  public name: string;
 
-  constructor(name: string, birthday: string, breed: string) {
-    this.name = name;
-    this.birthday = new Date(birthday);
-    this.breed = breed;
-  }
+  @IsDateString()
+  public birthday: string;
+
+  @IsString()
+  public breed: string;
 
   toCat(): Cat {
     return {
       name: this.name,
-      age: new Date().getFullYear() - this.birthday.getFullYear(),
+      age: new Date().getFullYear() - new Date(this.birthday).getFullYear(),
       breed: this.breed,
     };
   }

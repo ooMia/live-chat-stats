@@ -38,7 +38,7 @@ export class EventsGateway {
     this.server.to(room).emit('joined', room);
   }
 
-  // 'chat' event send the message back to all connected clients
+  // 'send' event send the message back to all connected clients
   @SubscribeMessage('send')
   receive(
     @MessageBody() data: string,

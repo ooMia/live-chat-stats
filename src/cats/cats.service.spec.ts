@@ -14,11 +14,11 @@ describe('CatsService', () => {
   });
 
   it('should be defined', async () => {
-    const catCreateDto = new CreateCatDto(
-      'test',
-      new Date().getFullYear() - 1 + '-01-01',
-      'test',
-    );
+    const catCreateDto = new CreateCatDto();
+    catCreateDto.name = 'test';
+    catCreateDto.birthday = new Date().getFullYear() - 1 + '-01-01';
+    catCreateDto.breed = 'test';
+
     expect(service.create(catCreateDto)).toEqual(
       'This action adds a new cat with the following details: {"name":"test","age":1,"breed":"test"}',
     );
